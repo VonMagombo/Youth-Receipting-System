@@ -1,6 +1,6 @@
 # Youth Subscription & Receipt System — Build Plan
 
-Status: **draft, awaiting sign-off** · Owner: Youth Department
+Status: **Phase 1 built** (see `mobile/README.md`) · Owner: Youth Department
 
 ## 1. Problem
 
@@ -146,15 +146,27 @@ and are marked "imported" (they carry no device signature).
 | **2 — Sync** | Firebase login, two devices, sync, verify page, voided-status lookup | Treasurer and Secretary share one ledger |
 | **3 — Hardening** | PIN lock, device revocation, admin screen, audit log viewer | Safe to rely on long-term |
 
-## 9. Open decisions
+## 9. Decisions
 
-1. **Report visibility.** Should the shared reports name members in arrears, or
-   show totals only (with the named list going to leadership)? Sharing names of
-   minors who owe money in a WhatsApp group raises privacy and pastoral concerns.
-2. **Logo.** Supply the official AFM in Zimbabwe logo file (PNG, ideally ≥ 512px,
-   transparent background) and confirm the Youth Department may use it on receipts.
-3. **Firebase account.** Which Google account will own the Firebase project? It
-   should be a church/department account, not a personal one, so the data
-   doesn't leave with one person.
-4. **Default allocation.** Is "oldest unpaid month first" the right default?
-5. **Member identifier.** Do members already have numbers, or should the app assign them?
+1. **Report visibility:** group reports show totals only; named arrears lists go to leadership.
+2. **Logo:** Elshaddai Assembly logo supplied by the department (`mobile/assets/logo-original.jpg`).
+3. **Firebase:** the requester's own Firebase account (see risk note below).
+4. **Default allocation:** oldest unpaid month first (collector can override).
+5. **Member numbers:** assigned by the app (`Y0001`…).
+
+## 10. Phase 1 deviations from the plan
+
+- Navigation uses a small in-app stack instead of a navigation library (fewer native deps).
+- The verification page was pulled forward from Phase 2 because the QR code needs it. It checks
+  signatures against a static `keys.json`; voided-status lookup still needs Phase 2.
+- Excel import also accepts an optional **Payments** sheet for history from the paper book
+  (receipt series `H-`, unsigned, marked "from paper book").
+
+## 11. Open items for Phase 2
+
+- **Member numbers across two phones.** Numbers come from a counter on each phone, so two phones
+  adding members offline could both issue `Y0042`. Before enabling the second phone, either let
+  only one phone add members, or prefix member numbers by device.
+- **Firebase ownership.** The project will sit on a personal account. Add a second church
+  administrator as Owner in the Firebase console so access doesn't depend on one person.
+- Replace SheetJS 0.18.5 with 0.20.3 (see `mobile/README.md`).

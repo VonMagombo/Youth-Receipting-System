@@ -23,11 +23,17 @@ npx expo install --fix      # fix incompatible package versions
 
 Run lint and typecheck before declaring any task done.
 
-## Navigation & Routing
+## Navigation
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
+This app deliberately does **not** use Expo Router: `src/ui/nav.tsx` is a small stack navigator
+(routes are a union type, `App.tsx` maps them to screens). Keep business logic in `src/core`
+(pure, unit-tested) and database access in `src/db/repo.ts`.
+
+## Network-restricted environments
+
+If docs.expo.dev / api.expo.dev are unreachable, `npx expo install` fails. Read compatible versions
+from `node_modules/expo/bundledNativeModules.json` and install them with npm, and check APIs in
+each package's `build/*.d.ts`.
 
 ## Building with EAS
 

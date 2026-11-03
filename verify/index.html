@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Receipt Check</title>
+<style>
+  :root { --navy:#1d1b5e; --green:#1f7a3e; --greenSoft:#e6f4ea; --red:#c8212a; --redSoft:#fdecec; --ink:#1a1a2e; --muted:#62627a; --line:#dcdce6; --bg:#f5f5fa; --card:#fff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#ececf4; --muted:#a6a6bc; --line:#34344a; --bg:#121220; --card:#1c1c2e; --greenSoft:#143222; --redSoft:#3a1518; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 -apple-system, Roboto, "Segoe UI", Helvetica, Arial, sans-serif; }
+  header { background:#1d1b5e; color:#fff; padding:14px 16px; display:flex; gap:12px; align-items:center; }
+  header img { width:44px; height:44px; border-radius:50%; background:#fff; }
+  header b { display:block; font-size:16px; } header span { font-size:13px; opacity:.85; }
+  main { max-width:560px; margin:0 auto; padding:16px; }
+  .verdict { border-radius:14px; padding:18px; margin-bottom:14px; text-align:center; }
+  .verdict h1 { margin:0 0 4px; font-size:28px; letter-spacing:.5px; }
+  .ok { background:var(--greenSoft); color:var(--green); border:2px solid var(--green); }
+  .bad { background:var(--redSoft); color:var(--red); border:2px solid var(--red); }
+  .wait { background:var(--card); color:var(--muted); border:1px solid var(--line); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; }
+  td { padding:7px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  td:first-child { color:var(--muted); width:40%; }
+  td:last-child { font-weight:600; }
+  .muted { color:var(--muted); font-size:14px; }
+  textarea { width:100%; min-height:90px; border:1px solid var(--line); border-radius:10px; padding:10px; font:13px monospace; background:var(--card); color:var(--ink); }
+  button { margin-top:8px; min-height:44px; padding:0 18px; border-radius:10px; border:0; background:#1d1b5e; color:#fff; font-weight:700; font-size:15px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="" />
+  <div><b>AFM in Zimbabwe · Elshaddai Assembly</b><span>Youth Department — receipt check</span></div>
+</header>
+<main>
+  <div id="verdict" class="verdict wait"><h1>Checking…</h1></div>
+
+  <div id="details" class="card" hidden>
+    <table id="fields"></table>
+    <p class="muted" style="margin-bottom:0">
+      <b>Compare these details with the receipt you were given.</b> The check proves these exact
+      details were issued by a registered collector's phone. A receipt whose amount, name or months
+      differ from what is shown here has been altered.
+    </p>
+  </div>
+
+  <div id="paste" class="card" hidden>
+    <p style="margin-top:0">Paste the text from the receipt's QR code:</p>
+    <textarea id="pasted" placeholder="AFMY1#r=T-2026-00001&amp;…"></textarea>
+    <button id="check" type="button">Check receipt</button>
+  </div>
+
+  <p class="muted">
+    Only trust this result on the official address you were given by the Youth Department. A forged
+    receipt could point its QR code to a look-alike page. Receipts voided after issue still show as
+    genuine here until cloud sync is enabled; ask the Treasurer if in doubt.
+  </p>
+</main>
+<script type="module" src="verify.js"></script>
+</body>
+</html>

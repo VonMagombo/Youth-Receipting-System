@@ -24,7 +24,7 @@ export function verificationLink(verifyBaseUrl: string, claim: ReceiptClaim, sig
 export function receiptHtml(v: ReceiptView, logoDataUri: string, verifyBaseUrl: string): string {
   const c = v.claim;
   const qr = v.signature
-    ? `<div class="qr">${qrSvg(verificationLink(verifyBaseUrl, c, v.signature), 96)}<div>Scan to verify<br/>key ${esc(c.keyId)}</div></div>`
+    ? `<div class="qr">${qrSvg(verificationLink(verifyBaseUrl, c, v.signature), 136)}<div>Scan to verify<br/>key ${esc(c.keyId)}</div></div>`
     : `<div class="qr muted">Recorded from paper book<br/>(no digital signature)</div>`;
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/>
 <style>${BASE_CSS}

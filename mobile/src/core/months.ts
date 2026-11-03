@@ -7,13 +7,13 @@ const MONTH_RE = /^(\d{4})-(0[1-9]|1[0-2])$/;
 const DATE_RE = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 const NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export function isMonth(s: unknown): s is Month {
+export function isMonth(s: unknown): boolean {
   return typeof s === 'string' && MONTH_RE.test(s);
 }
 
-export function isISODate(s: unknown): s is ISODate {
+export function isISODate(s: unknown): boolean {
   if (typeof s !== 'string' || !DATE_RE.test(s)) return false;
-  const [y, m, d] = s.split('-').map(Number);
+  const [y, m, d] = (s as string).split('-').map(Number);
   const dt = new Date(Date.UTC(y, m - 1, d));
   return dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
 }

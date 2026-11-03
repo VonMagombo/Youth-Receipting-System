@@ -65,18 +65,19 @@ export function verifyClaim(c: ReceiptClaim, signatureB64Url: string, publicKeyH
 
 /** URL fragment (never sent to the server) carrying the claim + signature, for the QR code. */
 export function claimToFragment(c: ReceiptClaim, sig: string): string {
-  const p = new URLSearchParams({
-    r: c.receiptNo,
-    m: c.memberNo,
-    n: c.name,
-    a: String(c.amountUsd),
-    p: c.method,
-    mo: [...c.months].sort().join(','),
-    d: c.paidOn,
-    k: c.keyId,
-    s: sig,
-  });
-  return p.toString();
+  // Built by hand (not URLSearchParams) so output is identical on React Native and in tests.
+  const fields: [string, string][] = [
+    ['r', c.receiptNo],
+    ['m', c.memberNo],
+    ['n', c.name],
+    ['a', String(c.amountUsd)],
+    ['p', c.method],
+    ['mo', [...c.months].sort().join(',')],
+    ['d', c.paidOn],
+    ['k', c.keyId],
+    ['s', sig],
+  ];
+  return fields.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
 }
 
 export function fragmentToClaim(fragment: string): { claim: ReceiptClaim; sig: string } | null {
