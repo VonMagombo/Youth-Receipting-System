@@ -1,6 +1,6 @@
 export const ORG = {
   church: 'AFM in Zimbabwe',
-  assembly: 'Elshaddai Assembly',
+  assembly: 'El-Shaddai Christian Center Assembly',
   department: 'Youth Department',
   subscriptionUsd: 1,
 } as const;

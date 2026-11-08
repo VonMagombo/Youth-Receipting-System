@@ -20,7 +20,8 @@ export function SetupScreen({ repo, initial, onDone, onCancel }: { repo: Repo; i
       <View style={[s.body, { gap: 4 }]}>
         <View style={{ alignItems: 'center', marginVertical: 16 }}>
           <Image source={require('../../assets/logo-256.png')} style={{ width: 96, height: 96 }} />
-          <Text style={{ fontSize: 18, fontWeight: '800', color: C.navy, marginTop: 10 }}>{ORG.assembly}</Text>
+          <Text style={{ fontSize: 18, fontWeight: '800', color: C.blue, marginTop: 10 }}>{ORG.assembly}</Text>
+          <Muted>{ORG.church}</Muted>
           <Muted>{ORG.department} · Subscriptions</Muted>
         </View>
         <Card>

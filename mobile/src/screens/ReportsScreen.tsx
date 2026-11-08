@@ -48,11 +48,11 @@ export function ReportsScreen() {
       <Segmented value={kind} onChange={setKind} options={[{ value: 'weekly', label: 'Weekly' }, { value: 'monthly', label: 'Monthly' }]} />
       <Row style={{ justifyContent: 'space-between', marginBottom: 12 }}>
         <Pressable onPress={() => step(-1)} hitSlop={12}>
-          <Text style={{ fontSize: 22, color: C.navy }}>‹</Text>
+          <Text style={{ fontSize: 22, color: C.blue }}>‹</Text>
         </Pressable>
         <Text style={[s.h, { marginBottom: 0 }]}>{period}</Text>
         <Pressable onPress={() => step(1)} hitSlop={12}>
-          <Text style={{ fontSize: 22, color: C.navy }}>›</Text>
+          <Text style={{ fontSize: 22, color: C.blue }}>›</Text>
         </Pressable>
       </Row>
 

@@ -11,7 +11,7 @@ type Filter = 'all' | 'owing' | 'paid' | 'inactive';
 export function standingBadge(m: MemberWithStanding) {
   if (m.status === 'inactive') return <Badge text="inactive" tone="grey" />;
   if (m.owed > 0) return <Badge text={`owes $${m.owed}`} tone={m.owed >= 3 ? 'red' : 'amber'} />;
-  if (m.ahead > 0) return <Badge text={`+${m.ahead} ahead`} tone="navy" />;
+  if (m.ahead > 0) return <Badge text={`+${m.ahead} ahead`} tone="blue" />;
   return <Badge text="paid up" tone="green" />;
 }
 
@@ -35,7 +35,7 @@ export function MembersScreen({ onPick, title = 'Members' }: { onPick?: (m: Memb
 
   return (
     <Screen title={title} scroll={false}>
-      <TextInput value={q} onChangeText={setQ} placeholder="Search name, number or phone" style={[s.input, { marginBottom: 10 }]} placeholderTextColor="#9a9ab0" autoFocus={!!onPick} />
+      <TextInput value={q} onChangeText={setQ} placeholder="Search name, number or phone" style={[s.input, { marginBottom: 10 }]} placeholderTextColor={C.placeholder} autoFocus={!!onPick} />
       {!onPick ? (
         <Segmented
           value={filter}

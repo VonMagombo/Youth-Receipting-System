@@ -1,3 +1,4 @@
+import { COLORS } from '../brand';
 import { ORG } from '../config';
 import { dateLabel, monthLabel } from '../months';
 import type { MonthlyReport, ReceiptRange, Totals, WeeklyReport } from '../reports';
@@ -16,17 +17,18 @@ function shell(title: string, subtitle: string, audience: Audience, body: string
   @page { size: A4; margin: 28pt; }
   .kpis { display: flex; gap: 8px; margin: 10px 0; }
   .kpi { flex: 1; border: 1px solid ${BRAND.line}; border-radius: 8px; padding: 8px 10px; }
-  .kpi .v { font-size: 20px; font-weight: 800; color: ${BRAND.navy}; }
+  .kpi .v { font-size: 20px; font-weight: 800; color: ${BRAND.blue}; }
   .kpi .l { font-size: 10px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: .5px; }
   .tag { display: inline-block; font-size: 9.5px; padding: 2px 8px; border-radius: 10px; font-weight: 700;
-         background: ${audience === 'group' ? '#e8f3ea' : '#fdecec'}; color: ${audience === 'group' ? '#1f6b34' : BRAND.red}; }
-  tr:nth-child(even) td { background: #f6f6fa; }
+         background: ${audience === 'group' ? COLORS.greenSoft : COLORS.redSoft}; color: ${audience === 'group' ? COLORS.green : COLORS.red}; }
+  tr:nth-child(even) td { background: ${COLORS.bg}; }
   .warn { color: ${BRAND.red}; font-weight: 600; }
 </style></head><body>
 <div class="head"><img src="${logo}" alt=""/><div>
-  <div class="org1">${esc(ORG.church.toUpperCase())} · ${esc(ORG.assembly)}</div>
-  <div class="org2">${esc(ORG.department)} — ${esc(title)}</div>
-  <div class="org3">${esc(subtitle)} &nbsp; <span class="tag">${audience === 'group' ? 'GROUP SUMMARY' : 'LEADERSHIP — CONFIDENTIAL'}</span></div>
+  <div class="org1">${esc(ORG.church.toUpperCase())}</div>
+  <div class="org2">${esc(ORG.assembly)}</div>
+  <div class="org3">${esc(ORG.department)} — ${esc(title)}</div>
+  <div class="muted">${esc(subtitle)} &nbsp; <span class="tag">${audience === 'group' ? 'GROUP SUMMARY' : 'LEADERSHIP — CONFIDENTIAL'}</span></div>
 </div></div>
 ${body}
 <div class="foot">Generated ${esc(generatedAt)}. Amounts in USD. Subscription: ${usd(ORG.subscriptionUsd)} per member per month.</div>

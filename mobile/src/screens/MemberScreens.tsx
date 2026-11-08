@@ -47,11 +47,11 @@ export function MemberScreen({ id }: { id: string }) {
       <Card>
         <Row style={{ justifyContent: 'space-between', marginBottom: 8 }}>
           <Pressable onPress={() => setYear(year - 1)} hitSlop={10}>
-            <Text style={{ color: C.navy, fontSize: 18 }}>‹</Text>
+            <Text style={{ color: C.blue, fontSize: 18 }}>‹</Text>
           </Pressable>
           <Text style={s.h}>{year}</Text>
           <Pressable onPress={() => setYear(year + 1)} hitSlop={10}>
-            <Text style={{ color: C.navy, fontSize: 18 }}>›</Text>
+            <Text style={{ color: C.blue, fontSize: 18 }}>›</Text>
           </Pressable>
         </Row>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
@@ -60,8 +60,8 @@ export function MemberScreen({ id }: { id: string }) {
             const ex = exemptSet.has(mo);
             const paid = data.covered.has(mo) && !ex;
             const owing = !before && !paid && !ex && mo <= cur;
-            const bg = before ? '#f0f0f4' : paid ? C.greenSoft : ex ? C.amberSoft : owing ? C.redSoft : C.white;
-            const fg = before ? '#b0b0c0' : paid ? C.green : ex ? '#8a5a00' : owing ? C.red : C.muted;
+            const bg = before ? C.disabled : paid ? C.greenSoft : ex ? C.amberSoft : owing ? C.redSoft : C.white;
+            const fg = before ? C.disabledText : paid ? C.green : ex ? C.amberText : owing ? C.red : C.muted;
             return (
               <View key={mo} style={{ width: '23%', paddingVertical: 8, borderRadius: 8, backgroundColor: bg, alignItems: 'center', borderWidth: 1, borderColor: C.line }}>
                 <Text style={{ color: fg, fontWeight: '700' }}>{monthLabel(mo).slice(0, 3)}</Text>
@@ -91,7 +91,7 @@ export function MemberScreen({ id }: { id: string }) {
                 </Muted>
               </View>
               <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                <Text style={{ fontWeight: '800', color: p.voided ? C.muted : C.navy, textDecorationLine: p.voided ? 'line-through' : 'none' }}>${p.amountUsd}</Text>
+                <Text style={{ fontWeight: '800', color: p.voided ? C.muted : C.blue, textDecorationLine: p.voided ? 'line-through' : 'none' }}>${p.amountUsd}</Text>
                 {p.voided ? <Badge text="VOID" tone="red" /> : null}
               </View>
             </Row>

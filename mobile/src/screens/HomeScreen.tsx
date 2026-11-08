@@ -54,8 +54,8 @@ export function HomeScreen() {
       <Row style={{ marginBottom: 14 }}>
         <Image source={require('../../assets/logo-256.png')} style={{ width: 52, height: 52 }} />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: '800', color: C.navy, fontSize: 16 }}>{ORG.church}</Text>
-          <Text style={{ fontWeight: '600', color: C.navy }}>{ORG.assembly}</Text>
+          <Text style={{ fontWeight: '800', color: C.blue, fontSize: 16 }}>{ORG.assembly}</Text>
+          <Text style={{ fontWeight: '600', color: C.muted }}>{ORG.church}</Text>
           <Muted>
             {device.collectorName} · receipts {device.prefix}-…
           </Muted>
@@ -73,12 +73,12 @@ export function HomeScreen() {
       <Row style={{ marginBottom: 12 }}>
         <Card style={{ flex: 1, marginBottom: 0 }}>
           <Muted>{monthLabel(month)}</Muted>
-          <Text style={{ fontSize: 26, fontWeight: '800', color: C.navy }}>${data?.collected ?? '–'}</Text>
+          <Text style={{ fontSize: 26, fontWeight: '800', color: C.blue }}>${data?.collected ?? '–'}</Text>
           <Muted>today ${data?.today ?? '–'}</Muted>
         </Card>
         <Card style={{ flex: 1, marginBottom: 0 }}>
           <Muted>Active members</Muted>
-          <Text style={{ fontSize: 26, fontWeight: '800', color: C.navy }}>{data?.active ?? '–'}</Text>
+          <Text style={{ fontSize: 26, fontWeight: '800', color: C.blue }}>{data?.active ?? '–'}</Text>
           <Muted>{data ? `${data.owing} owing` : ' '}</Muted>
         </Card>
       </Row>
@@ -107,7 +107,7 @@ export function HomeScreen() {
                 </Muted>
               </View>
               <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                <Text style={{ fontWeight: '800', color: p.voided ? C.muted : C.navy, textDecorationLine: p.voided ? 'line-through' : 'none' }}>${p.amountUsd}</Text>
+                <Text style={{ fontWeight: '800', color: p.voided ? C.muted : C.blue, textDecorationLine: p.voided ? 'line-through' : 'none' }}>${p.amountUsd}</Text>
                 {p.voided ? <Badge text="VOID" tone="red" /> : p.imported ? <Badge text="paper" tone="grey" /> : null}
               </View>
             </Row>
