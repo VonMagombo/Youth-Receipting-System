@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { normalizePhone } from '../core/importer';
 import { standing } from '../core/ledger';
 import { addMonths, currentMonth, dateLabel, isMonth, monthLabel, monthRange } from '../core/months';
+import type { Member } from '../db/repo';
 import { attempt, useApp, useLoad } from '../ui/app';
 import { Badge, Btn, C, Card, Field, KV, Muted, PromptModal, Row, s, Screen, Segmented } from '../ui/kit';
 import { useNav } from '../ui/nav';
@@ -135,23 +136,26 @@ export function MemberScreen({ id }: { id: string }) {
 }
 
 export function MemberFormScreen({ id }: { id?: string }) {
+  const { repo } = useApp();
+  const { data: existing, error } = useLoad(async () => {
+    if (!id) return null;
+    const m = await repo.getMember(id);
+    if (!m) throw new Error('This member no longer exists.');
+    return m;
+  }, [id]);
+  // Editing: wait for the member so the form starts filled in. The key resets the form if the member changes.
+  if (id && !existing) return <Screen title="Edit member">{error ? <Muted>{error}</Muted> : null}</Screen>;
+  return <MemberForm key={existing?.id ?? 'new'} id={id} existing={existing ?? null} />;
+}
+
+function MemberForm({ id, existing }: { id?: string; existing: Member | null }) {
   const { repo, device, changed } = useApp();
   const nav = useNav();
-  const { data: existing } = useLoad(async () => (id ? repo.getMember(id) : null), [id]);
-  const [name, setName] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [start, setStart] = React.useState(currentMonth());
-  const [status, setStatus] = React.useState<'active' | 'inactive'>('active');
+  const [name, setName] = React.useState(existing?.fullName ?? '');
+  const [phone, setPhone] = React.useState(existing?.phone ?? '');
+  const [start, setStart] = React.useState(existing?.startMonth ?? currentMonth());
+  const [status, setStatus] = React.useState<'active' | 'inactive'>(existing?.status ?? 'active');
   const [busy, setBusy] = React.useState(false);
-
-  React.useEffect(() => {
-    if (existing) {
-      setName(existing.fullName);
-      setPhone(existing.phone ?? '');
-      setStart(existing.startMonth);
-      setStatus(existing.status);
-    }
-  }, [existing]);
 
   const phoneNorm = normalizePhone(phone);
   const phoneErr = phoneNorm === undefined ? 'Use a Zimbabwe number like 0771234567, or +country code.' : null;
@@ -194,7 +198,8 @@ export function MemberFormScreen({ id }: { id?: string }) {
             setBusy(false);
             if (res) {
               changed();
-              id ? nav.pop() : nav.replace({ name: 'member', id: res });
+              if (id) nav.pop();
+              else nav.replace({ name: 'member', id: res });
             }
           }}
         />

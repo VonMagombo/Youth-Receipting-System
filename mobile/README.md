@@ -26,14 +26,16 @@ workflow (same signing key).
 | Fix a mistake | Open the receipt → Void (with reason) → issue a new one |
 | Hardship | Member → Exempt a month (reason + who approved) |
 | Weekly / monthly report | Reports → Weekly/Monthly → Youth group (totals) or Leadership (names) → Share PDF |
-| Backup | Excel → Export to Excel (do this weekly until sync exists) |
+| Backup | Excel → Export to Excel, or **Back up now** on the home screen. The home screen asks for a backup as soon as there is data that was never backed up, and again once any change has gone 7 days without one (red after 14). After the share sheet closes, the app asks whether the file was really saved or sent; only **Yes** counts. Send the file to the church Google Drive or email |
 
 ## Development
 
 ```bash
 npm ci
-npm test            # 28 unit tests: ledger, signing, import, reports, SQLite repo + triggers
+npm test            # ledger, signing, import, reports, SQLite repo + triggers, backup reminder,
+                    # release-signing plugin, and verify/verify.js run against app-signed receipts
 npm run typecheck   # app + tests
+npm run lint        # ESLint with Expo's rules; CI fails on any error or warning
 npx expo start      # needs a development build, since the app uses native modules
 ```
 
@@ -51,13 +53,33 @@ src/screens/     UI screens;  src/ui/  kit, tiny stack navigator, app context
 test/            vitest; node:sqlite adapter runs the real schema and triggers
 ```
 
+### Release signing
+
+`plugins/withReleaseSigning.js` makes release builds use the key in `ANDROID_KEYSTORE_PATH` /
+`ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_ALIAS`. CI loads them from GitHub secrets and fails if they
+are missing or if the built APK carries any other certificate. One-time setup:
+`../docs/RELEASE_SIGNING.md`.
+
+### Restoring a phone
+
+**The Excel backup is a record, not a restore.** It holds every member, receipt (with its number,
+signature and void status), exemption and audit entry, so nothing is lost if the phone dies: the
+department can read it, print it, and prove what was collected. But there is no "restore" button yet,
+and importing the backup file through **Excel → Import** does **not** rebuild the ledger correctly:
+
+- voided receipts would come back as live payments;
+- a receipt that was voided and re-issued makes the whole import fail ("already paid or exempt");
+- members are numbered again, so `Y0002` may become `Y0001` and no longer match old receipts;
+- the Exemptions sheet is not read, so exempt months would show as owed;
+- receipts come in as unsigned `H-` paper-book entries, and the `T-` counter restarts at 00001.
+
+So until a real restore exists (Phase 2 sync makes the cloud copy the restore path): if a phone is
+lost, keep its backup file as the record, set up the replacement phone, and re-enter only the member
+list. Members' old receipts stay valid on the verify page as long as the old phone's key stays in
+`verify/keys.json` (revoke it from the loss date, never delete it).
+
 ### Known issues
 
-- **SheetJS `xlsx@0.18.5`** has two advisories (prototype pollution and ReDoS when parsing a
-  crafted file). Fixed versions are published only on SheetJS's CDN, which the build sandbox could
-  not reach. The app only parses files the collector picks, which limits the exposure. Fix on a
-  normal network:
-  `npm i https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz && npm test`
-- Release builds are signed with the Expo template's debug keystore. Fine for installing directly
-  on two phones; switch to a private keystore (GitHub secret) before wider distribution.
 - Remaining `npm audit` findings are in Expo's build tooling (`glob`, `minimatch`), not in the app.
+- SheetJS is installed from the SheetJS CDN (`xlsx-0.20.3.tgz`, integrity pinned in the lockfile)
+  because fixed versions are not published to npm.

@@ -169,4 +169,48 @@ and are marked "imported" (they carry no device signature).
   only one phone add members, or prefix member numbers by device.
 - **Firebase ownership.** The project will sit on a personal account. Add a second church
   administrator as Owner in the Firebase console so access doesn't depend on one person.
-- Replace SheetJS 0.18.5 with 0.20.3 (see `mobile/README.md`).
+- **Lossless restore.** The Excel backup is a complete record but cannot be imported back yet: the
+  importer ignores void status and the Exemptions sheet, renumbers members, and fails on a voided and
+  re-issued receipt (see "Restoring a phone" in `mobile/README.md`). A restore that keeps receipt
+  numbers, signatures, voids, exemptions and counters is needed before the backup can replace a lost
+  phone. Phase 2 sync may make this unnecessary.
+
+## 12. Hardening done after Phase 1
+
+Decision (2026-11-03): stay Android-only with one collector phone for now. A web app adds nothing
+until someone other than the collector needs access (e.g. leadership viewing reports); `src/core` is
+plain TypeScript so it can be reused then.
+
+- SheetJS upgraded to 0.20.3 (closes the prototype-pollution and ReDoS advisories).
+- Home-screen backup reminder: due at once if data was never backed up, or once a change has gone 7 days
+  without a backup; overdue after 14. A backup only counts when the collector confirms the file was saved
+  or sent.
+- Release APKs signed with the department's own key (`docs/RELEASE_SIGNING.md`); CI refuses to ship
+  anything else.
+- `verify/verify.js` is tested against receipts signed by the app, so the two cannot drift apart.
+- ESLint (`eslint-config-expo`) runs in CI before the tests, with zero warnings allowed.
+
+## 13. Pilot
+
+Decision (2026-11-08): during the pilot **Matthew is the admin**, and pilot receipts are **test data
+only**: they are not given to real members, and the pilot phone is wiped before the Treasurer starts.
+
+"Admin" is not a role inside the app. It means holding these four things:
+
+| What | Why it matters |
+|---|---|
+| GitHub repo `VonMagombo/Youth-Receipting-System` | Builds every APK |
+| Release signing key + its GitHub secrets (`docs/RELEASE_SIGNING.md`) | Without it no update installs over the app |
+| Firebase project | Hosts the verify page, and the data from Phase 2 |
+| `verify/keys.json` | Decides which phones' receipts show GENUINE |
+
+Handover to the Treasurer at the end of the pilot:
+
+1. Uninstall the app on the pilot phone (or clear its data), so pilot receipts and the pilot
+   receipt counter are gone. The Treasurer's real receipts start again at `T-<year>-00001`.
+2. Remove the pilot phone's key from `verify/keys.json` and deploy, so pilot receipts no longer
+   verify. (A real phone's key is never removed, only revoked; pilot receipts were never real.)
+3. Install the release-signed APK on the Treasurer's phone, set it up as **Treasurer**, and add
+   its key to `verify/keys.json`.
+4. Decide which of the four admin items move to the church; at minimum, back up the release key
+   and add a second church administrator as Firebase Owner (§11).

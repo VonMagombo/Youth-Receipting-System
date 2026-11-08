@@ -1,20 +1,24 @@
 import React from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { AppState, Image, Pressable, Text, View } from 'react-native';
+import { backupStatus } from '../core/backup';
 import { ORG } from '../core/config';
 import { currentMonth, dateLabel, monthLabel, todayLocal } from '../core/months';
-import { useApp, useLoad } from '../ui/app';
+import { exportBackup } from '../platform/backup';
+import { attempt, useApp, useLoad } from '../ui/app';
 import { Badge, Btn, C, Card, Muted, Row, s, Screen } from '../ui/kit';
 import { useNav } from '../ui/nav';
 
 export function HomeScreen() {
-  const { repo, device } = useApp();
+  const { repo, device, changed } = useApp();
   const nav = useNav();
+  const [backingUp, setBackingUp] = React.useState(false);
   const month = currentMonth();
-  const { data } = useLoad(async () => {
-    const [members, recent, monthPays] = await Promise.all([
+  const { data, reload } = useLoad(async () => {
+    const [members, recent, monthPays, backupIn] = await Promise.all([
       repo.membersWithStanding(month),
       repo.recentPayments(8),
       repo.paymentsBetween(`${month}-01`, `${month}-31`),
+      repo.backupInputs(),
     ]);
     const active = members.filter((m) => m.status === 'active');
     const live = monthPays.filter((p) => !p.voided && !p.imported);
@@ -24,8 +28,26 @@ export function HomeScreen() {
       collected: live.reduce((a, p) => a + p.amountUsd, 0),
       today: live.filter((p) => p.paidOn === todayLocal()).reduce((a, p) => a + p.amountUsd, 0),
       recent,
+      backup: backupStatus({ ...backupIn, now: new Date() }),
     };
   });
+
+  // The reminder depends on today's date: re-check it whenever the app comes back to the foreground,
+  // or a phone left on this screen for days would keep showing "ok".
+  React.useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') reload();
+    });
+    return () => sub.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const backUpNow = async () => {
+    setBackingUp(true);
+    const ok = await attempt(() => exportBackup(repo), 'Backup failed');
+    setBackingUp(false);
+    if (ok) changed();
+  };
 
   return (
     <Screen title={`${ORG.department}`} right={<Pressable onPress={() => nav.push({ name: 'settings' })} hitSlop={10}><Text style={{ color: C.white, fontSize: 15 }}>Settings</Text></Pressable>}>
@@ -39,6 +61,14 @@ export function HomeScreen() {
           </Muted>
         </View>
       </Row>
+
+      {data && data.backup.level !== 'ok' ? (
+        <Card style={{ backgroundColor: data.backup.level === 'overdue' ? C.redSoft : C.amberSoft, borderColor: data.backup.level === 'overdue' ? C.red : C.gold }}>
+          <Text style={{ fontWeight: '800', color: data.backup.level === 'overdue' ? C.red : C.ink, marginBottom: 4 }}>Back up this phone</Text>
+          <Muted style={{ marginBottom: 10 }}>{data.backup.message} Send the file to the church Google Drive or email.</Muted>
+          <Btn label="Back up now" busy={backingUp} onPress={backUpNow} />
+        </Card>
+      ) : null}
 
       <Row style={{ marginBottom: 12 }}>
         <Card style={{ flex: 1, marginBottom: 0 }}>
@@ -84,7 +114,7 @@ export function HomeScreen() {
           </Card>
         </Pressable>
       ))}
-      <Muted style={{ textAlign: 'center', marginTop: 8 }}>Data is stored on this phone. Back it up weekly from Excel → Export.</Muted>
+      <Muted style={{ textAlign: 'center', marginTop: 8 }}>Data is stored on this phone. {data?.backup.level === 'ok' ? data.backup.message : 'Back it up weekly.'}</Muted>
     </Screen>
   );
 }

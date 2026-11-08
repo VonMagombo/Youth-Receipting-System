@@ -173,12 +173,15 @@ export function PromptModal({
   onCancel: () => void;
   onConfirm: (values: Record<string, string>) => Promise<void> | void;
 }) {
-  const [values, setValues] = React.useState<Record<string, string>>({});
+  const initialValues = () => Object.fromEntries(fields.map((f) => [f.key, f.initial ?? '']));
+  const [values, setValues] = React.useState<Record<string, string>>(initialValues);
   const [busy, setBusy] = React.useState(false);
-  React.useEffect(() => {
-    if (visible) setValues(Object.fromEntries(fields.map((f) => [f.key, f.initial ?? ''])));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+  // Refill the fields each time the dialog opens (state adjusted during render, not in an effect).
+  const [wasVisible, setWasVisible] = React.useState(visible);
+  if (visible !== wasVisible) {
+    setWasVisible(visible);
+    if (visible) setValues(initialValues());
+  }
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={s.modalBg}>

@@ -66,6 +66,12 @@ export interface RepoDeps {
 
 export class RepoError extends Error {}
 
+const LAST_BACKUP_KEY = 'last_backup_at';
+/** audit_log.seq of the newest change included in the last backup. */
+const LAST_BACKUP_SEQ_KEY = 'last_backup_seq';
+/** Audit action for an export. Excluded when finding the last data change, since it changes no data. */
+const BACKUP_ACTION = 'backup.export';
+
 type MemberRow = { id: string; member_no: string; full_name: string; phone: string | null; start_month: string; status: 'active' | 'inactive' };
 type PaymentRow = {
   id: string;
@@ -473,14 +479,72 @@ export class Repo {
     return { members: reportMembers, payments: reportPayments, exempt };
   }
 
-  /** Flat tables for the Excel backup export. */
-  async exportTables() {
-    const members = await this.listMembers();
-    const payments = (await this.db.all<PaymentRow>(`${PAYMENT_SELECT} ORDER BY p.paid_on, p.receipt_no`)).map(toPayment);
-    const exemptions = await this.db.all<Record<string, unknown>>(
+  /**
+   * Inputs for `backupStatus`. "Unsaved" is decided by audit_log.seq, not by timestamps, so a
+   * phone clock that was wrong at some point cannot make a real change look backed up.
+   */
+  async backupInputs(): Promise<{ lastBackupAt: string | null; oldestUnsavedAt: string | null }> {
+    const lastSeq = Number((await this.getSetting(LAST_BACKUP_SEQ_KEY)) ?? 0);
+    const oldest = await this.db.get<{ at: string }>(`SELECT at FROM audit_log WHERE seq > ? AND action <> ? ORDER BY seq LIMIT 1`, [
+      lastSeq,
+      BACKUP_ACTION,
+    ]);
+    return { lastBackupAt: await this.getSetting(LAST_BACKUP_KEY), oldestUnsavedAt: oldest?.at ?? null };
+  }
+
+  /**
+   * Record a backup made from the snapshot whose `seq` came from `backupSnapshot()`. Changes made
+   * after the snapshot was read stay unsaved.
+   */
+  async markBackedUp(seq: number): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      for (const [key, value] of [
+        [LAST_BACKUP_KEY, this.stamp()],
+        [LAST_BACKUP_SEQ_KEY, String(seq)],
+      ]) {
+        await tx.run(`INSERT INTO meta(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`, [key, value]);
+      }
+      await this.audit(tx, 'app', BACKUP_ACTION, { seq });
+    });
+  }
+
+  /** Everything for the Excel backup, plus the audit position it covers (for `markBackedUp`). */
+  async backupSnapshot(): Promise<{ seq: number; sheets: Record<string, Record<string, unknown>[]> }> {
+    return this.db.transaction(async (tx) => {
+      const seq = (await tx.get<{ seq: number | null }>(`SELECT MAX(seq) AS seq FROM audit_log`))?.seq ?? 0;
+      const t = await this.exportTables(tx);
+      const sheets = {
+        Members: t.members.map((m) => ({ member_no: m.memberNo, full_name: m.fullName, phone: m.phone ?? '', start_month: m.startMonth, status: m.status })),
+        Payments: t.payments.map((p) => ({
+          receipt_no: p.receiptNo,
+          member_no: p.memberNo,
+          full_name: p.memberName,
+          date: p.paidOn,
+          amount_usd: p.amountUsd,
+          method: p.method,
+          mobile_ref: p.mobileRef ?? '',
+          months: p.months.join(','),
+          collected_by: p.collectedBy,
+          voided: p.voided ? 'yes' : '',
+          void_reason: p.voided?.reason ?? '',
+          signature: p.signature ?? '',
+          key_id: p.keyId ?? '',
+        })),
+        Exemptions: t.exemptions,
+        AuditLog: t.audit,
+      };
+      return { seq, sheets };
+    });
+  }
+
+  /** Flat tables for the Excel backup. Every query goes through `db` so a snapshot reads one consistent state. */
+  private async exportTables(db: Db) {
+    const members = (await db.all<MemberRow>(`SELECT * FROM members ORDER BY full_name COLLATE NOCASE`)).map(toMember);
+    const payments = (await db.all<PaymentRow>(`${PAYMENT_SELECT} ORDER BY p.paid_on, p.receipt_no`)).map(toPayment);
+    const exemptions = await db.all<Record<string, unknown>>(
       `SELECT m.member_no, m.full_name, e.month, e.reason, e.approved_by, e.created_at FROM exemptions e JOIN members m ON m.id = e.member_id ORDER BY e.month`,
     );
-    const audit = await this.db.all<Record<string, unknown>>(`SELECT * FROM audit_log ORDER BY seq`);
+    const audit = await db.all<Record<string, unknown>>(`SELECT * FROM audit_log ORDER BY seq`);
     return { members, payments, exemptions, audit };
   }
 }

@@ -27,25 +27,22 @@ function PayForm({ memberId }: { memberId: string }) {
   const [amount, setAmount] = React.useState(1);
   const [method, setMethod] = React.useState<PayMethod>('cash');
   const [ref, setRef] = React.useState('');
-  const [selected, setSelected] = React.useState<Month[]>([]);
+  const [picked, setPicked] = React.useState<Month[]>([]);
   const [manual, setManual] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
 
-  // Default allocation (oldest unpaid first) follows the amount unless the collector picked months by hand.
-  React.useEffect(() => {
-    if (data?.member && !manual) setSelected(allocateMonths(data.member.startMonth, data.covered, amount));
-  }, [data, amount, manual]);
-
   if (!data?.member) return <Screen title="Record payment">{data ? <Muted>Member not found.</Muted> : null}</Screen>;
   const m = data.member;
+  // Default allocation (oldest unpaid first) follows the amount unless the collector picked months by hand.
+  const selected = manual ? picked : allocateMonths(m.startMonth, data.covered, amount);
   const gridStart = m.startMonth < addMonths(cur, -23) ? addMonths(cur, -23) : m.startMonth;
   const grid = monthRange(gridStart, addMonths(cur, 12));
   const problems = checkPayment({ amountUsd: amount, months: selected, startMonth: m.startMonth, covered: data.covered, current: cur });
   const refMissing = method === 'mobile' && !ref.trim();
 
   const toggle = (mo: Month) => {
+    setPicked(selected.includes(mo) ? selected.filter((x) => x !== mo) : [...selected, mo].sort());
     setManual(true);
-    setSelected((sel) => (sel.includes(mo) ? sel.filter((x) => x !== mo) : [...sel, mo].sort()));
   };
 
   const submit = () => {
