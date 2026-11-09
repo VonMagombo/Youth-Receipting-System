@@ -1,3 +1,10 @@
 {
-  "keys": []
+  "keys": [
+    {
+      "keyId": "T-3bcb4c0b",
+      "publicKey": "739d2890212a92a5b906db9a663cb9d3820edf650e6c933405c7d5047d3ea9f6",
+      "owner": "Matt Hardy",
+      "revokedAt": null
+    }
+  ]
 }
