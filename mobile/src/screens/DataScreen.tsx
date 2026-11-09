@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { ImportPlan, planImport } from '../core/importer';
 import { currentMonth, monthLabel } from '../core/months';
+import { exportBackup } from '../platform/backup';
 import { IMPORT_TEMPLATE, pickWorkbook, shareWorkbook } from '../platform/files';
 import { attempt, useApp } from '../ui/app';
 import { Badge, Btn, C, Card, KV, Muted, Row, s, Screen } from '../ui/kit';
@@ -38,35 +39,9 @@ export function DataScreen() {
 
   const exportAll = async () => {
     setBusy('export');
-    await attempt(async () => {
-      const t = await repo.exportTables();
-      const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
-      await shareWorkbook(
-        `youth-subs-backup-${stamp}.xlsx`,
-        {
-          Members: t.members.map((m) => ({ member_no: m.memberNo, full_name: m.fullName, phone: m.phone ?? '', start_month: m.startMonth, status: m.status })),
-          Payments: t.payments.map((p) => ({
-            receipt_no: p.receiptNo,
-            member_no: p.memberNo,
-            full_name: p.memberName,
-            date: p.paidOn,
-            amount_usd: p.amountUsd,
-            method: p.method,
-            mobile_ref: p.mobileRef ?? '',
-            months: p.months.join(','),
-            collected_by: p.collectedBy,
-            voided: p.voided ? 'yes' : '',
-            void_reason: p.voided?.reason ?? '',
-            signature: p.signature ?? '',
-            key_id: p.keyId ?? '',
-          })),
-          Exemptions: t.exemptions,
-          AuditLog: t.audit,
-        },
-        'Save or send the backup',
-      );
-    }, 'Export failed');
+    const ok = await attempt(() => exportBackup(repo), 'Export failed');
     setBusy(null);
+    if (ok) changed();
   };
 
   const counts = plan
