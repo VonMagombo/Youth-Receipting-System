@@ -154,6 +154,9 @@ and are marked "imported" (they carry no device signature).
    PDF logo and `verify/logo.png` are generated from it by `node mobile/scripts/build-logo.js`. App and
    PDF colors come from the emblem: blue `#004f90`, gold `#c99f35`.
 3. **Firebase:** the requester's own Firebase account (see risk note below).
+   Project `elshaddai-youth` (created 2026-11-09, on Matthew's personal Google account). The verify page
+   is live at **https://elshaddai-youth.web.app/**: this is the address printed in every receipt's QR code.
+   Redeploy after any change to `verify/` (e.g. `keys.json`): `firebase deploy --only hosting` from the repo root.
 4. **Default allocation:** oldest unpaid month first (collector can override).
 5. **Member numbers:** assigned by the app (`Y0001`…).
 
