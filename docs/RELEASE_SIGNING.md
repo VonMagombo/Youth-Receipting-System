@@ -14,7 +14,7 @@ umask 077
 mkdir -p ~/.youth-subs-signing && cd ~/.youth-subs-signing
 openssl rand -base64 33 | tr -d '/+=\n' | head -c 32 > password.txt
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -days 10000 \
-  -subj "/CN=Youth Subs/O=AFM in Zimbabwe El-Shaddai Christian Center Assembly Youth Department/C=ZW" \
+  -subj "/CN=Youth Subs/O=El-Shaddai Christian Center Assembly/OU=Youth Department/C=ZW" \
   -keyout key.pem -out cert.pem
 openssl pkcs12 -export -inkey key.pem -in cert.pem -name youthsubs \
   -out release.p12 -passout file:password.txt
@@ -32,7 +32,7 @@ above):
 ```bash
 keytool -genkeypair -storetype pkcs12 -keystore release.p12 -alias youthsubs \
   -keyalg RSA -keysize 2048 -validity 10000 \
-  -dname "CN=Youth Subs, O=AFM in Zimbabwe El-Shaddai Christian Center Assembly Youth Department, C=ZW" \
+  -dname "CN=Youth Subs, O=El-Shaddai Christian Center Assembly, OU=Youth Department, C=ZW" \
   -storepass:file password.txt -keypass:file password.txt
 keytool -list -v -storetype pkcs12 -keystore release.p12 -storepass:file password.txt \
   | awk '$1 == "SHA256:" {print $2}' | tr -d ':' | tr 'A-F' 'a-f'
