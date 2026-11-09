@@ -20,7 +20,7 @@ export function SettingsScreen({ onRekey }: { onRekey: () => void }) {
         <Muted style={{ marginBottom: 8 }}>
           Add this to the verification page’s keys.json so it can confirm receipts from this phone. It is safe to share: it can check receipts but not create them.
         </Muted>
-        <Text selectable style={{ fontFamily: 'monospace', fontSize: 12, color: C.ink, backgroundColor: '#f0f0f6', padding: 10, borderRadius: 8 }}>
+        <Text selectable style={{ fontFamily: 'monospace', fontSize: 12, color: C.ink, backgroundColor: C.disabled, padding: 10, borderRadius: 8 }}>
           {JSON.stringify({ keyId: device.keyId, publicKey: device.publicKeyHex, owner: device.collectorName })}
         </Text>
         <Muted style={{ marginTop: 6 }}>Long-press the text to copy it.</Muted>

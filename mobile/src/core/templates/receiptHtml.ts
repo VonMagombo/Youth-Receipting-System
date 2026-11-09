@@ -1,3 +1,4 @@
+import { RECEIPT_FONT_BOLD, RECEIPT_FONT_REGULAR } from '../../assets/receiptFont';
 import { ORG } from '../config';
 import { dateLabel, monthsLabel } from '../months';
 import { claimToFragment, ReceiptClaim } from '../signing';
@@ -11,6 +12,15 @@ export interface ReceiptView {
   mobileRef: string | null;
   voided: { reason: string; at: string } | null;
 }
+
+/**
+ * Receipts use a monospace face for a printed, till-slip look. DejaVu Sans Mono is embedded because
+ * Android has no Monaco/DejaVu/OCR font; the fallbacks cover any character outside its Latin subset.
+ */
+export const RECEIPT_FONT_STACK = `'Receipt Mono', 'DejaVu Sans Mono', 'Droid Sans Mono', monospace`;
+const FONT_FACES = `
+  @font-face { font-family: 'Receipt Mono'; font-weight: 400; src: url(${RECEIPT_FONT_REGULAR}) format('woff2'); }
+  @font-face { font-family: 'Receipt Mono'; font-weight: 700 900; src: url(${RECEIPT_FONT_BOLD}) format('woff2'); }`;
 
 /** Page size for expo-print, in points (A6 portrait). */
 export const RECEIPT_PAGE = { width: 298, height: 420 };
@@ -27,19 +37,19 @@ export function receiptHtml(v: ReceiptView, logoDataUri: string, verifyBaseUrl: 
     ? `<div class="qr">${qrSvg(verificationLink(verifyBaseUrl, c, v.signature), 136)}<div>Scan to verify<br/>key ${esc(c.keyId)}</div></div>`
     : `<div class="qr muted">Recorded from paper book<br/>(no digital signature)</div>`;
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/>
-<style>${BASE_CSS}
+<style>${FONT_FACES}${BASE_CSS}
   @page { size: ${RECEIPT_PAGE.width}pt ${RECEIPT_PAGE.height}pt; margin: 14pt; }
-  body { font-size: 10.5px; }
+  body { font-size: 10px; font-family: ${RECEIPT_FONT_STACK}; }
   .head img { width: 48px; height: 48px; }
-  .org1 { font-size: 12.5px; } .org2 { font-size: 10.5px; } .org3 { font-size: 9.5px; }
+  .org1 { font-size: 8.5px; } .org2 { font-size: 12.5px; } .org3 { font-size: 9.5px; }
   .title { display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 4px; }
-  .title b { font-size: 13px; color: ${BRAND.navy}; letter-spacing: 1px; }
-  .no { font-family: "Roboto Mono", Menlo, monospace; font-weight: 700; color: ${BRAND.red}; font-size: 12px; }
+  .title b { font-size: 13px; color: ${BRAND.blue}; letter-spacing: 1px; }
+  .no { font-family: inherit; font-weight: 700; color: ${BRAND.red}; font-size: 12px; }
   td { padding: 3px 0; } td.k { color: ${BRAND.muted}; width: 34%; }
-  .amount { font-size: 22px; font-weight: 800; color: ${BRAND.navy}; margin: 6px 0 2px; }
+  .amount { font-size: 22px; font-weight: 800; color: ${BRAND.blue}; margin: 6px 0 2px; }
   .qr { display: flex; align-items: center; gap: 8px; font-size: 8.5px; color: ${BRAND.muted}; margin-top: 8px; }
   .void { position: fixed; top: 40%; left: 0; right: 0; text-align: center; transform: rotate(-24deg);
-          font-size: 64px; font-weight: 900; color: rgba(215,38,46,.28); letter-spacing: 6px; }
+          font-size: 64px; font-weight: 900; color: rgba(200,33,42,.28); letter-spacing: 6px; }
   .voidnote { color: ${BRAND.red}; font-weight: 700; margin-top: 6px; }
 </style></head><body>
 ${v.voided ? '<div class="void">VOID</div>' : ''}

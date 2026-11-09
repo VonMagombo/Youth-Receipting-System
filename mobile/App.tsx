@@ -68,7 +68,7 @@ export default function App() {
       </View>
     );
   } else if (!repo || device === undefined) {
-    body = <ActivityIndicator style={{ flex: 1 }} color={C.navy} />;
+    body = <ActivityIndicator style={{ flex: 1 }} color={C.blue} />;
   } else if (!device || rekeying) {
     body = (
       <SetupScreen

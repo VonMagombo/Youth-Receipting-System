@@ -21,7 +21,7 @@ and syncing when online.
 | R5 | Advance payments | A payment covers N specific months |
 | R6 | Excel import | Members (and optional payment history) from .xlsx |
 | R7 | PDF receipt shared via WhatsApp | Via Android share sheet |
-| R8 | AFM in Zimbabwe logo + QR code for authenticity | Logo file to be supplied by the department |
+| R8 | AFM in Zimbabwe logo + QR code for authenticity | Logo supplied 2026-11-08 (see §9 decision 2) |
 | R9 | Weekly and monthly reports | PDF, shareable to WhatsApp |
 | R10 | Android phone app, offline-first with sync | |
 | R11 | Ship fast | Phased delivery below |
@@ -149,7 +149,10 @@ and are marked "imported" (they carry no device signature).
 ## 9. Decisions
 
 1. **Report visibility:** group reports show totals only; named arrears lists go to leadership.
-2. **Logo:** Elshaddai Assembly logo supplied by the department (`mobile/assets/logo-original.jpg`).
+2. **Logo and name:** the AFM in Zimbabwe emblem with the name **El-Shaddai Christian Center Assembly**
+   (decided 2026-11-08), supplied as `mobile/assets/logo-original.jpg`. Every icon, the in-app logo, the
+   PDF logo and `verify/logo.png` are generated from it by `node mobile/scripts/build-logo.js`. App and
+   PDF colors come from the emblem: blue `#004f90`, gold `#c99f35`.
 3. **Firebase:** the requester's own Firebase account (see risk note below).
 4. **Default allocation:** oldest unpaid month first (collector can override).
 5. **Member numbers:** assigned by the app (`Y0001`…).

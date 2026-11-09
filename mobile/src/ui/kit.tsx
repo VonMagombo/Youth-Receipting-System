@@ -12,23 +12,11 @@ import {
   ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../core/brand';
 import { useNav } from './nav';
 
-export const C = {
-  navy: '#1d1b5e',
-  navySoft: '#e9e8f6',
-  gold: '#c99a2e',
-  red: '#c8212a',
-  redSoft: '#fdecec',
-  green: '#1f7a3e',
-  greenSoft: '#e6f4ea',
-  amberSoft: '#fff4dc',
-  ink: '#1a1a2e',
-  muted: '#62627a',
-  line: '#dcdce6',
-  bg: '#f5f5fa',
-  white: '#ffffff',
-};
+/** App colors. Defined in core/brand so the PDFs and tests share them. */
+export const C = COLORS;
 
 export function Screen({ title, children, right, scroll = true }: { title: string; children: React.ReactNode; right?: React.ReactNode; scroll?: boolean }) {
   const nav = useNav();
@@ -89,17 +77,17 @@ export function Btn({
 }
 
 const btnKinds = {
-  primary: { bg: C.navy, fg: C.white, border: C.navy },
-  secondary: { bg: C.white, fg: C.navy, border: C.navy },
+  primary: { bg: C.blue, fg: C.white, border: C.blue },
+  secondary: { bg: C.white, fg: C.blue, border: C.blue },
   danger: { bg: C.white, fg: C.red, border: C.red },
-  ghost: { bg: 'transparent', fg: C.navy, border: 'transparent' },
+  ghost: { bg: 'transparent', fg: C.blue, border: 'transparent' },
 };
 
 export function Field({ label, hint, error, ...props }: TextInputProps & { label: string; hint?: string; error?: string | null }) {
   return (
     <View style={{ marginBottom: 14 }}>
       <Text style={s.label}>{label}</Text>
-      <TextInput placeholderTextColor="#9a9ab0" style={[s.input, error ? { borderColor: C.red } : null]} {...props} />
+      <TextInput placeholderTextColor={C.placeholder} style={[s.input, error ? { borderColor: C.red } : null]} {...props} />
       {error ? <Text style={s.error}>{error}</Text> : hint ? <Text style={s.hint}>{hint}</Text> : null}
     </View>
   );
@@ -117,13 +105,13 @@ export function Segmented<T extends string>({ value, options, onChange }: { valu
   );
 }
 
-export function Badge({ text, tone }: { text: string; tone: 'green' | 'red' | 'amber' | 'grey' | 'navy' }) {
+export function Badge({ text, tone }: { text: string; tone: 'green' | 'red' | 'amber' | 'grey' | 'blue' }) {
   const t = {
     green: [C.greenSoft, C.green],
     red: [C.redSoft, C.red],
-    amber: [C.amberSoft, '#8a5a00'],
-    grey: ['#ececf2', C.muted],
-    navy: [C.navySoft, C.navy],
+    amber: [C.amberSoft, C.amberText],
+    grey: [C.disabled, C.muted],
+    blue: [C.blueSoft, C.blue],
   }[tone];
   return (
     <View style={[s.badge, { backgroundColor: t[0] }]}>
@@ -215,7 +203,7 @@ export function PromptModal({
 
 export const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: C.navy, gap: 8 },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: C.blue, borderBottomWidth: 3, borderBottomColor: C.gold, gap: 8 },
   back: { paddingRight: 6 },
   backText: { color: C.white, fontSize: 30, lineHeight: 30, marginTop: -4 },
   title: { color: C.white, fontSize: 18, fontWeight: '700', flex: 1 },
@@ -227,11 +215,11 @@ export const s = StyleSheet.create({
   input: { backgroundColor: C.white, borderWidth: 1, borderColor: C.line, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: C.ink },
   hint: { fontSize: 12, color: C.muted, marginTop: 4 },
   error: { fontSize: 12, color: C.red, marginTop: 4 },
-  seg: { flexDirection: 'row', backgroundColor: C.navySoft, borderRadius: 10, padding: 3, marginBottom: 14 },
+  seg: { flexDirection: 'row', backgroundColor: C.blueSoft, borderRadius: 10, padding: 3, marginBottom: 14 },
   segItem: { flex: 1, paddingVertical: 9, borderRadius: 8, alignItems: 'center' },
   segActive: { backgroundColor: C.white, elevation: 1 },
   segText: { color: C.muted, fontWeight: '600' },
-  segTextActive: { color: C.navy },
+  segTextActive: { color: C.blue },
   badge: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-start' },
   badgeText: { fontSize: 12, fontWeight: '700' },
   h: { fontSize: 17, fontWeight: '700', color: C.ink, marginBottom: 8 },

@@ -34,7 +34,7 @@ export function ReceiptScreen({ paymentId }: { paymentId: string }) {
     <Screen title={p.receiptNo}>
       <Card>
         <Row style={{ justifyContent: 'space-between' }}>
-          <Text style={{ fontSize: 32, fontWeight: '800', color: p.voided ? C.muted : C.navy, textDecorationLine: p.voided ? 'line-through' : 'none' }}>${p.amountUsd}</Text>
+          <Text style={{ fontSize: 32, fontWeight: '800', color: p.voided ? C.muted : C.blue, textDecorationLine: p.voided ? 'line-through' : 'none' }}>${p.amountUsd}</Text>
           {p.voided ? <Badge text="VOID" tone="red" /> : p.imported ? <Badge text="from paper book" tone="grey" /> : <Badge text="signed" tone="green" />}
         </Row>
         <KV k="Received from" v={`${p.memberName} (${p.memberNo})`} />

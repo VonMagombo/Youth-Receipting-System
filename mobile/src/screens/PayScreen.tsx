@@ -80,7 +80,7 @@ function PayForm({ memberId }: { memberId: string }) {
         <Text style={s.label}>Amount (USD)</Text>
         <Row style={{ justifyContent: 'center', marginBottom: 12 }}>
           <Btn label="−" kind="secondary" onPress={() => setAmount((a) => Math.max(1, a - 1))} style={{ width: 56 }} />
-          <Text style={{ fontSize: 34, fontWeight: '800', color: C.navy, minWidth: 90, textAlign: 'center' }}>${amount}</Text>
+          <Text style={{ fontSize: 34, fontWeight: '800', color: C.blue, minWidth: 90, textAlign: 'center' }}>${amount}</Text>
           <Btn label="+" kind="secondary" onPress={() => setAmount((a) => Math.min(MAX_MONTHS_PER_PAYMENT, a + 1))} style={{ width: 56 }} />
         </Row>
         <Text style={s.label}>Paid by</Text>
@@ -95,7 +95,7 @@ function PayForm({ memberId }: { memberId: string }) {
           <Text style={s.label}>Months covered ({selected.length} of {amount})</Text>
           {manual ? (
             <Pressable onPress={() => setManual(false)} hitSlop={8}>
-              <Text style={{ color: C.navy, fontWeight: '700' }}>Reset</Text>
+              <Text style={{ color: C.blue, fontWeight: '700' }}>Reset</Text>
             </Pressable>
           ) : null}
         </Row>
@@ -115,12 +115,12 @@ function PayForm({ memberId }: { memberId: string }) {
                   borderRadius: 8,
                   alignItems: 'center',
                   borderWidth: 1.5,
-                  borderColor: on ? C.navy : C.line,
-                  backgroundColor: taken ? '#ececf2' : on ? C.navy : mo <= cur ? C.redSoft : C.white,
+                  borderColor: on ? C.blue : C.line,
+                  backgroundColor: taken ? C.disabled : on ? C.blue : mo <= cur ? C.redSoft : C.white,
                 }}
               >
-                <Text style={{ color: taken ? '#a0a0b4' : on ? C.white : C.ink, fontWeight: '700', fontSize: 13 }}>{monthLabel(mo).slice(0, 3)}</Text>
-                <Text style={{ color: taken ? '#a0a0b4' : on ? C.white : C.muted, fontSize: 11 }}>{taken ? 'paid' : mo.slice(0, 4)}</Text>
+                <Text style={{ color: taken ? C.disabledText : on ? C.white : C.ink, fontWeight: '700', fontSize: 13 }}>{monthLabel(mo).slice(0, 3)}</Text>
+                <Text style={{ color: taken ? C.disabledText : on ? C.white : C.muted, fontSize: 11 }}>{taken ? 'paid' : mo.slice(0, 4)}</Text>
               </Pressable>
             );
           })}

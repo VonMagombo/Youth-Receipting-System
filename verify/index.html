@@ -6,12 +6,12 @@
 <meta name="robots" content="noindex" />
 <title>Receipt Check</title>
 <style>
-  :root { --navy:#1d1b5e; --green:#1f7a3e; --greenSoft:#e6f4ea; --red:#c8212a; --redSoft:#fdecec; --ink:#1a1a2e; --muted:#62627a; --line:#dcdce6; --bg:#f5f5fa; --card:#fff; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#ececf4; --muted:#a6a6bc; --line:#34344a; --bg:#121220; --card:#1c1c2e; --greenSoft:#143222; --redSoft:#3a1518; } }
+  :root { --blue:#004f90; --green:#1f7a3e; --greenSoft:#e6f4ea; --red:#c8212a; --redSoft:#fdecec; --ink:#1a2433; --muted:#5d6b7a; --line:#d6dde5; --bg:#f4f7fa; --card:#fff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#e8eef5; --muted:#9fb0c2; --line:#263548; --bg:#0f1722; --card:#172231; --green:#6fd391; --greenSoft:#143222; --red:#ff8a8f; --redSoft:#3a1518; } }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 -apple-system, Roboto, "Segoe UI", Helvetica, Arial, sans-serif; }
-  header { background:#1d1b5e; color:#fff; padding:14px 16px; display:flex; gap:12px; align-items:center; }
-  header img { width:44px; height:44px; border-radius:50%; background:#fff; }
+  header { background:var(--blue); color:#fff; padding:14px 16px; display:flex; gap:12px; align-items:center; }
+  header img { width:44px; height:44px; flex:none; }
   header b { display:block; font-size:16px; } header span { font-size:13px; opacity:.85; }
   main { max-width:560px; margin:0 auto; padding:16px; }
   .verdict { border-radius:14px; padding:18px; margin-bottom:14px; text-align:center; }
@@ -26,14 +26,14 @@
   td:last-child { font-weight:600; }
   .muted { color:var(--muted); font-size:14px; }
   textarea { width:100%; min-height:90px; border:1px solid var(--line); border-radius:10px; padding:10px; font:13px monospace; background:var(--card); color:var(--ink); }
-  button { margin-top:8px; min-height:44px; padding:0 18px; border-radius:10px; border:0; background:#1d1b5e; color:#fff; font-weight:700; font-size:15px; }
+  button { margin-top:8px; min-height:44px; padding:0 18px; border-radius:10px; border:0; background:var(--blue); color:#fff; font-weight:700; font-size:15px; }
   [hidden] { display:none !important; }
 </style>
 </head>
 <body>
 <header>
   <img src="logo.png" alt="" />
-  <div><b>AFM in Zimbabwe · Elshaddai Assembly</b><span>Youth Department — receipt check</span></div>
+  <div><b>El-Shaddai Christian Center Assembly</b><span>AFM in Zimbabwe · Youth Department · receipt check</span></div>
 </header>
 <main>
   <div id="verdict" class="verdict wait"><h1>Checking…</h1></div>
