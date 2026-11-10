@@ -9,8 +9,9 @@ weekly/monthly reports. Works fully offline. Built with Expo SDK 58 (React Nativ
    `youth-subs-apk` artifact (a zip containing `youth-subs-<commit>.apk`).
 2. Send the APK to the Treasurer's / Secretary's phone (WhatsApp, Drive or USB), open it, and allow
    "Install unknown apps" when Android asks.
-3. On first start choose **Treasurer** or **Secretary**, enter the name to print on receipts, and
-   (once it is deployed) the verification page address. See `../docs/VERIFY_SETUP.md`.
+3. On first start choose **Treasurer** or **Secretary** and enter the name to print on receipts.
+   The verification page address is already filled in (`https://elshaddai-youth.web.app/`); leave
+   it. See `../docs/VERIFY_SETUP.md`.
 4. **Settings → Public key**: copy the line shown into `verify/keys.json` so the verification page
    recognises this phone's receipts.
 

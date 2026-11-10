@@ -13,3 +13,9 @@ export const DEVICE_PREFIXES = [
   { prefix: 'T', label: 'Treasurer' },
   { prefix: 'S', label: 'Secretary' },
 ] as const;
+
+/**
+ * The live receipt verification page (Firebase project `elshaddai-youth`, see docs/PLAN.md). Every
+ * receipt's QR code points here unless the phone has been given another address in Settings.
+ */
+export const DEFAULT_VERIFY_URL = 'https://elshaddai-youth.web.app/';

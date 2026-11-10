@@ -1,7 +1,8 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DEVICE_PREFIXES, ORG } from '../core/config';
+import { DEFAULT_VERIFY_URL, DEVICE_PREFIXES, ORG } from '../core/config';
+import { parseVerifyUrl, VERIFY_URL_ERROR } from '../core/verifyUrl';
 import type { Repo } from '../db/repo';
 import { DeviceSettings, setupDevice } from '../platform/device';
 import { attempt } from '../ui/app';
@@ -11,9 +12,10 @@ import { Btn, C, Card, Field, Muted, s, Segmented } from '../ui/kit';
 export function SetupScreen({ repo, initial, onDone, onCancel }: { repo: Repo; initial?: DeviceSettings | null; onDone: (d: DeviceSettings) => void; onCancel?: () => void }) {
   const [prefix, setPrefix] = React.useState<string>(initial?.prefix ?? 'T');
   const [name, setName] = React.useState(initial?.collectorName ?? '');
-  const [url, setUrl] = React.useState(initial?.verifyBaseUrl ?? '');
+  const [url, setUrl] = React.useState(DEFAULT_VERIFY_URL);
   const [busy, setBusy] = React.useState(false);
-  const urlOk = !url.trim() || /^https:\/\/[^\s/]+\.[^\s]+$/.test(url.trim());
+  // Re-keying keeps the address; it is changed on its own from Settings, where the change is logged.
+  const urlOk = initial ? true : parseVerifyUrl(url) !== null;
 
   return (
     <SafeAreaView style={s.safe}>
@@ -29,19 +31,22 @@ export function SetupScreen({ repo, initial, onDone, onCancel }: { repo: Repo; i
           <Text style={s.label}>This phone belongs to the</Text>
           <Segmented value={prefix} onChange={setPrefix} options={DEVICE_PREFIXES.map((d) => ({ value: d.prefix, label: d.label }))} />
           <Field label="Your name (printed on receipts)" value={name} onChangeText={setName} placeholder="e.g. Tatenda Chikomo" autoCapitalize="words" />
-          <Field
-            label="Verification page address"
-            value={url}
-            onChangeText={setUrl}
-            placeholder="https://your-project.web.app/"
-            autoCapitalize="none"
-            keyboardType="url"
-            hint="Optional for now. Receipts made before this is set carry a QR code that the verification page can still check by pasting."
-            error={urlOk ? null : 'Must start with https://'}
-          />
+          {initial ? null : (
+            <Field
+              label="Verification page address"
+              value={url}
+              onChangeText={setUrl}
+              placeholder={DEFAULT_VERIFY_URL}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+              hint="Already set to the church's page. Change it only if the page moves. Left blank, the church's page is used."
+              error={urlOk ? null : VERIFY_URL_ERROR}
+            />
+          )}
           {initial ? (
             <Muted style={{ marginBottom: 12, color: C.red }}>
-              Saving creates a NEW signing key. Receipts already issued stay valid as long as the old key stays listed on the verification page.
+              Saving creates a NEW signing key. Receipts already issued stay valid as long as the old key stays listed on the verification page. To change only the verification page address, use Settings → Verification page instead.
             </Muted>
           ) : null}
           <Btn
@@ -50,7 +55,7 @@ export function SetupScreen({ repo, initial, onDone, onCancel }: { repo: Repo; i
             disabled={name.trim().length < 2 || !urlOk}
             onPress={async () => {
               setBusy(true);
-              const d = await attempt(() => setupDevice(repo, { prefix, collectorName: name, verifyBaseUrl: url }));
+              const d = await attempt(() => setupDevice(repo, { prefix, collectorName: name, verifyBaseUrl: initial ? undefined : url }));
               setBusy(false);
               if (d) onDone(d);
             }}
