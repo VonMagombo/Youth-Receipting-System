@@ -22,8 +22,18 @@ the church, e.g. `elshaddai-youth`. **The project ID is the address members will
 
 ## 2. Tell the app the address
 
-On each phone: **Settings → Change collector / create new key**, and enter
-`https://<project-id>.web.app/`. (New key is fine; just add it to keys.json as below.)
+The church's page, `https://elshaddai-youth.web.app/`, is built into the app (`DEFAULT_VERIFY_URL`
+in `mobile/src/core/config.ts`). Any phone running an APK built from this change or later uses it
+unless it has been given another address, so beyond installing that APK there is nothing to do on
+the phone. A phone set up earlier with the address left blank picks it up as soon as the new APK is
+installed over the old one. Check it under **Settings → Verification page**. A test fails if the
+constant and `.firebaserc` disagree.
+
+To point a phone somewhere else: **Settings → Verification page → Change address**. That keeps
+the phone's signing key, so its entry in keys.json stays valid, and the change goes in the
+activity log. The address must be `https://`, plain ASCII (enter an international domain in its
+`xn--` form) and at most 100 characters, so the receipt QR code stays scannable. Clearing the field
+goes back to the church's page. *Change collector / create new key* no longer touches the address.
 
 ## 3. Register each phone's key
 

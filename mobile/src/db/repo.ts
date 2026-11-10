@@ -4,6 +4,7 @@ import { allocateMonths, checkPayment, standing } from '../core/ledger';
 import { currentMonth, isMonth, ISODate, Month, todayLocal } from '../core/months';
 import type { ReportMember, ReportPayment } from '../core/reports';
 import type { PayMethod, ReceiptClaim } from '../core/signing';
+import { effectiveVerifyUrl, parseVerifyUrl, VERIFY_URL_ERROR } from '../core/verifyUrl';
 import { Db, SCHEMA, SCHEMA_VERSION } from './schema';
 
 export interface Member {
@@ -71,6 +72,8 @@ const LAST_BACKUP_KEY = 'last_backup_at';
 const LAST_BACKUP_SEQ_KEY = 'last_backup_seq';
 /** Audit action for an export. Excluded when finding the last data change, since it changes no data. */
 const BACKUP_ACTION = 'backup.export';
+/** Settings key for the verification page address (see core/verifyUrl.ts). */
+export const VERIFY_URL_KEY = 'verify_base_url';
 
 type MemberRow = { id: string; member_no: string; full_name: string; phone: string | null; start_month: string; status: 'active' | 'inactive' };
 type PaymentRow = {
@@ -160,6 +163,23 @@ export class Repo {
 
   async setSetting(key: string, value: string): Promise<void> {
     await this.db.run(`INSERT INTO meta(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`, [key, value]);
+  }
+
+  /**
+   * Point this phone's receipts at another verification page. Leaves the signing key alone, and is
+   * audited because it decides where members go to check a receipt. Returns the address now in use.
+   */
+  async changeVerifyUrl(input: string, actor: string): Promise<string> {
+    const url = parseVerifyUrl(input);
+    if (url === null) throw new RepoError(VERIFY_URL_ERROR);
+    return this.db.transaction(async (tx) => {
+      const from = effectiveVerifyUrl((await tx.get<{ value: string }>(`SELECT value FROM meta WHERE key = ?`, [VERIFY_URL_KEY]))?.value ?? null);
+      const to = effectiveVerifyUrl(url);
+      if (to === from) return to;
+      await tx.run(`INSERT INTO meta(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`, [VERIFY_URL_KEY, url]);
+      await this.audit(tx, actor, 'settings.verify_url', { from, to });
+      return to;
+    });
   }
 
   private async audit(db: Db, actor: string, action: string, detail: object) {
