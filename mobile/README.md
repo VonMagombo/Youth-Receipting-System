@@ -40,6 +40,28 @@ npm run lint        # ESLint with Expo's rules; CI fails on any error or warning
 npx expo start      # needs a development build, since the app uses native modules
 ```
 
+### Development build (on a phone, with live reload)
+
+The dev build installs as a **separate app**, "Youth Subs (Dev)" with ID
+`org.elshaddai.youthreceipts.dev`, next to the real one. It has its own empty database and device
+key, so testing never touches real receipts. Never build a dev variant under the real ID: a debug
+build cannot update the release-signed app, and the uninstall Android then asks for deletes the
+phone's receipts and signing key. `app.config.js` sets the ID, and only when `APP_VARIANT=development`
+is set; CI and release builds ignore it.
+
+Needs the Android SDK and JDK 17, plus a phone with USB debugging allowed (`adb devices` shows it as
+`device`):
+
+```bash
+export ANDROID_HOME=~/Android/Sdk JAVA_HOME=~/.local/jdk-17   # adjust to your machine
+export APP_VARIANT=development
+npx expo prebuild -p android --clean   # first time, and after a native dependency or app.json changes
+npx expo run:android --device          # builds, installs "Youth Subs (Dev)", starts the dev server
+```
+
+After that, `APP_VARIANT=development npx expo start` is enough: open "Youth Subs (Dev)" on the phone
+and JavaScript changes reload live. The generated `android/` folder is gitignored.
+
 `RENDER_OUT=/tmp/samples npx vitest run test/render-samples.test.ts` writes sample receipt and
 report HTML for visual review.
 
