@@ -30,6 +30,9 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# EAS local credentials: points at the release key and holds its password
+credentials.json
+
 # local env files
 .env*.local
 

@@ -29,6 +29,12 @@
       "expo-sqlite",
       "./plugins/withReleaseSigning",
       "expo-sharing"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "03cfa57f-4a8c-4df5-b7b7-46f826808f29"
+      }
+    },
+    "owner": "vonmagombo"
   }
 }
