@@ -49,8 +49,16 @@ build cannot update the release-signed app, and the uninstall Android then asks 
 phone's receipts and signing key. `app.config.js` sets the ID, and only when `APP_VARIANT=development`
 is set; CI and release builds ignore it.
 
-Needs the Android SDK and JDK 17, plus a phone with USB debugging allowed (`adb devices` shows it as
-`device`):
+**On Expo's servers** (no Android SDK needed, uses EAS build minutes): the `development` profile in
+`eas.json` sets `APP_VARIANT=development` (a test fails if it does not).
+
+```bash
+npx eas-cli@latest build -p android --profile development   # then install the APK from the build page
+APP_VARIANT=development npx expo start                       # open "Youth Subs (Dev)" on the phone
+```
+
+**On this machine** needs the Android SDK and JDK 17, plus a phone with USB debugging allowed
+(`adb devices` shows it as `device`):
 
 ```bash
 export ANDROID_HOME=~/Android/Sdk JAVA_HOME=~/.local/jdk-17   # adjust to your machine

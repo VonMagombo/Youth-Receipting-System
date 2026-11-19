@@ -39,6 +39,16 @@ describe('app.config.js variants', () => {
     expect(() => applyVariant(base, 'staging')).toThrow(/unknown APP_VARIANT "staging"/);
   });
 
+  it('builds every EAS dev-client profile as the development variant, and the rest as the real app', () => {
+    type Profile = { developmentClient?: boolean; env?: Record<string, string> };
+    const eas = JSON.parse(readFileSync(new URL('../eas.json', import.meta.url), 'utf8')) as { build: Record<string, Profile> };
+    const profiles = Object.entries(eas.build);
+    expect(profiles.some(([, p]) => p.developmentClient)).toBe(true);
+    for (const [name, p] of profiles) {
+      expect([name, p.env?.APP_VARIANT]).toEqual([name, p.developmentClient ? 'development' : undefined]);
+    }
+  });
+
   it('reads APP_VARIANT from the environment', () => {
     const saved = process.env.APP_VARIANT;
     try {
