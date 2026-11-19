@@ -65,3 +65,30 @@ The first release-signed APK will not install over a build from before this chan
 yet: see "Restoring a phone" in `mobile/README.md` first, because an Excel backup is a record that
 cannot yet be imported back. If the phone only has test data, uninstall and
 install the new APK.
+
+## Building on Expo (EAS) with the same key
+
+EAS Build is a second way to get a signed APK, next to the GitHub workflow. The project is
+`@vonmagombo/youth-receipts` (id in `mobile/app.json`), and EAS holds a copy of the department key
+under the build credentials name `youthsubs-release`. It was uploaded once, like this:
+
+```bash
+cd mobile
+npx eas-cli@latest login                          # account vonmagombo
+python3 scripts/make-eas-credentials.py           # writes the gitignored credentials.json (mode 600)
+npx eas-cli@latest credentials -p android         # credentials.json -> Upload credentials from credentials.json to EAS
+rm credentials.json                               # it holds the password; EAS has the key now
+```
+
+The credentials screen then shows the keystore's SHA-256. It must equal the fingerprint from step 1.
+
+To build an installable APK (profile `preview` in `mobile/eas.json`):
+
+```bash
+cd mobile && npx eas-cli@latest build -p android --profile preview
+```
+
+`withReleaseSigning` leaves EAS alone: it only switches signing when `ANDROID_KEYSTORE_PATH` is set,
+and EAS signs with its stored key. Before installing a downloaded APK, check its certificate the way
+CI does: `keytool -printcert -jarfile app.apk` (or `apksigner verify --print-certs app.apk`) must
+show the same SHA-256.
